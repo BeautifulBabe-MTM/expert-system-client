@@ -25,7 +25,7 @@ export default function Login() {
             });
 
             console.log(meRes.data.user.isAdmin);
-            
+
             navigate("/");
         } catch (err) {
             setError(err.response?.data?.error || "Невірний email або пароль");

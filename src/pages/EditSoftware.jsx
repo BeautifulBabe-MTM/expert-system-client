@@ -1,8 +1,12 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { api } from "../api/api";
 
-export default function AddSoftwareForm() {
+export default function EditSoftware() {
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const token = localStorage.getItem("token");
+
     const [form, setForm] = useState({
         name: "",
         category: "",
@@ -12,6 +16,25 @@ export default function AddSoftwareForm() {
         purpose: [],
         description: "",
     });
+
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchSoftware = async () => {
+            try {
+                const res = await api.get(`/software/${id}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                setForm(res.data);
+            } catch (error) {
+                console.error("Помилка завантаження ПЗ:", error);
+                alert("Не вдалося отримати дані програми");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchSoftware();
+    }, [id, token]);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -31,20 +54,25 @@ export default function AddSoftwareForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await api.post("/software", form, {
-            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        });
-        alert("✅ Програму успішно додано!");
-        setForm({
-            name: "",
-            category: "",
-            os: [],
-            free: true,
-            suitableFor: [],
-            purpose: [],
-            description: "",
-        });
+        try {
+            await api.put(`/software/${id}`, form, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            alert("✅ Програму оновлено успішно!");
+            navigate("/manage");
+        } catch (error) {
+            console.error(error);
+            alert("Помилка оновлення програми");
+        }
     };
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-screen text-indigo-600 text-xl font-semibold">
+                Завантаження даних...
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white py-10 px-4 flex justify-center items-start">
@@ -53,7 +81,7 @@ export default function AddSoftwareForm() {
                 className="w-full max-w-2xl bg-white rounded-2xl shadow-lg p-8 border border-gray-100 space-y-6"
             >
                 <h2 className="text-2xl font-bold text-indigo-600 text-center mb-4">
-                    ➕ Додати нове програмне забезпечення
+                    ✏️ Редагувати програмне забезпечення
                 </h2>
 
                 <div>
@@ -62,11 +90,10 @@ export default function AddSoftwareForm() {
                     </label>
                     <input
                         name="name"
-                        placeholder="Наприклад: Visual Studio Code"
                         value={form.name}
                         onChange={handleChange}
-                        required
                         className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-400 outline-none"
+                        required
                     />
                 </div>
 
@@ -76,11 +103,10 @@ export default function AddSoftwareForm() {
                     </label>
                     <input
                         name="category"
-                        placeholder="Наприклад: Розробка, Офіс, Ігри"
                         value={form.category}
                         onChange={handleChange}
-                        required
                         className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-400 outline-none"
+                        required
                     />
                 </div>
 
@@ -181,10 +207,11 @@ export default function AddSoftwareForm() {
                 </div>
 
                 <div>
-                    <label className="block font-medium text-gray-700 mb-1">Опис</label>
+                    <label className="block font-medium text-gray-700 mb-1">
+                        Опис
+                    </label>
                     <textarea
                         name="description"
-                        placeholder="Коротко опишіть функціонал та переваги програми..."
                         value={form.description}
                         onChange={handleChange}
                         rows="4"
@@ -196,7 +223,7 @@ export default function AddSoftwareForm() {
                     type="submit"
                     className="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-medium hover:bg-indigo-700 transition"
                 >
-                    ✅ Додати програму
+                    💾 Зберегти зміни
                 </button>
             </form>
         </div>
