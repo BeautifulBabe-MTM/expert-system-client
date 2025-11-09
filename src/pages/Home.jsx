@@ -6,8 +6,8 @@ import { getRecommendations } from "../api/api";
 export default function Home() {
     const [form, setForm] = useState({
         os: "Windows",
-        purpose: "офіс",
-        level: "новачок",
+        purpose: "Офіс",
+        level: "Новачок",
         free: "any",
     });
 
@@ -25,7 +25,7 @@ export default function Home() {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white flex items-center justify-center px-4">
-            <div className="w-full max-w-2xl bg-white shadow-lg rounded-2xl p-8 border border-gray-100">
+            <div className="w-full max-w-2xl bg-gray-100 shadow-lg rounded-2xl p-8 border border-gray-100">
                 <h1 className="text-3xl font-bold text-indigo-600 text-center mb-8">
                     Експертна система вибору програмного забезпечення
                 </h1>
